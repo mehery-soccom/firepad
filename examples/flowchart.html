@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
+
+    <!-- Firepad -->
+    <link rel="stylesheet" href="https://firepad.io/releases/v1.5.9/firepad.css" />
+    <script src="https://firepad.io/releases/v1.5.9/firepad.js"></script>
+
+    <!-- Loader.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.js"></script>
+
+
+    <style>
+        html { height: 100%; }
+        body { margin: 0; height: 100%; position: relative; }
+        /* Height / width / positioning can be customized for your use case.
+           For demo purposes, we make firepad fill the entire browser. */
+        #firepad {
+            width: 30%;
+            height: 100%;
+            float: left;
+        }
+        .mermaidboxwrap{
+          width: 65%;
+          height: 100%;
+          float: left;
+        }
+        #canvas {
+            width: 100%;
+             height: 100%;
+        }
+
+    </style>
+
+</head>
+<body onload="init()">
+<div id="firepad"></div>
+<div class="mermaidboxwrap">
+    <div class=""><button id="download">Download</button></div>
+    <div id="mermaidbox" class="mermaidbox">
+
+    </div>
+    <a id="download_link" style="display: none;" download >Download</button>
+</div>
+
+
+<textarea id="defaultText" hidden>
+graph TD
+    A[Christmas]
+    B(Go shopping)
+    D[Laptop]
+    F[fa:fa-car Car]
+    C{Let me think}
+    A -->|Get money| B
+    B --> C
+    C -->|One| D
+    C -->|Two| E[iPhone]
+    C -->|Three| F
+ </textarea>  
+
+ <script src="https://cdn.jsdelivr.net/gh/webmodule/foo/foo.js"></script>
+<script>
+    var CODE_PAD;
+    function init() {
+        //// Initialize Firebase.
+        //// TODO: replace with your Firebase project configuration.
+        var config = {
+          apiKey: '<API_KEY>',
+          databaseURL: "https://firepad-test-e4255.firebaseio.com",
+          projectId: "firepad-test-e4255",
+        };
+        firebase.initializeApp(config);
+
+        //// Get Firebase Database reference.
+        var firepadRef = getExampleRef();
+
+        //// Create Monaco and firepad.
+        require.config({ 
+            paths: {
+                'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs',
+                'dist' : 'https://unpkg.com/mermaid@8.6.4/dist',
+                'js-base64' : 'https://cdn.jsdelivr.net/npm/js-base64@3.4.4'
+            }
+        });
+        require(['vs/editor/editor.main'], function() {
+
+            monaco.languages.register({ id: 'mermaid' });
+            // Register a tokens provider for the language
+            monaco.languages.setMonarchTokensProvider('mermaid', {
+                typeKeywords: [
+                  'graph', 'stateDiagram', 'sequenceDiagram', 'classDiagram', 'pie', 'flowchart', 'gantt'
+                ],
+                keywords: [
+                'patricipant','as'
+                ],
+                arrows: [
+                  '---', '===', '-->', '==>'
+                ],
+                tokenizer: {
+                  root: [
+                    [/[{}]/, 'delimiter.bracket'],
+                    [/[a-z_$][\w$]*/, { cases: { '@typeKeywords': 'keyword',
+                                            '@keywords': 'keyword'} }],
+                    [/[-=>ox]+/, { cases: { '@arrows': 'transition'} }],
+                    [/[\[\{\(}]+.+?[\)\]\}]+/, "string"],
+                    [/\".*\"/, "string"],
+                  ]
+                },
+                whitespace: [
+                    [/[ \t\r\n]+/, 'white'],
+                    [/\%\%.*$/,    'comment'],
+                ],
+            });
+
+            self.MonacoEnvironment = {
+                getWorkerUrl: function (moduleId, label) {
+                    return './editor.worker.bundle.js';
+                }
+            }
+
+            // Define a new theme that contains only rules that match this language
+            monaco.editor.defineTheme('myCoolTheme', {
+                base: 'vs',
+                inherit: false,
+                rules: [
+                  { token: 'keyword', foreground: '880000', fontStyle: 'bold' },
+                  { token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold' },
+                  { token: 'string', foreground: 'AA8500' },
+                  { token: 'transition', foreground: '008800', fontStyle: 'bold'},
+                  { token: 'delimiter.bracket', foreground: '000000', fontStyle: 'bold'},
+                ]
+              });
+
+            // Register a completion item provider for the new language
+            monaco.languages.registerCompletionItemProvider('mySpecialLanguage', {
+                provideCompletionItems: () => {
+                    var suggestions = [{
+                        label: 'simpleText',
+                        kind: monaco.languages.CompletionItemKind.Text,
+                        insertText: 'simpleText'
+                    }, {
+                        label: 'testing',
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        insertText: 'testing(${1:condition})',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+                    }, {
+                        label: 'ifelse',
+                        kind: monaco.languages.CompletionItemKind.Snippet,
+                        insertText: [
+                            'if (${1:condition}) {',
+                            '\t$0',
+                            '} else {',
+                            '\t',
+                            '}'
+                        ].join('\n'),
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'If-Else Statement'
+                    }];
+                    return { suggestions: suggestions };
+                }
+            });
+
+            editor = monaco.editor.create(
+                document.getElementById('firepad'),
+                {
+                  theme: 'myCoolTheme',
+                  // value: getCode(),
+                  //language: 'mySpecialLanguage'
+                  language: 'mermaid'
+                }
+            );
+            Firepad.fromMonaco(firepadRef, editor,{
+                defaultText: document.getElementById("defaultText").innerText
+            });
+            CODE_PAD = editor;
+            editor.onDidChangeModelContent(function(editor, change) {
+                window.renderChart();
+            });
+        });
+
+        require(['dist/mermaid'], function(mermaid) {
+
+            mermaid.initialize({
+                startOnLoad:false,
+                theme: 'default',
+                // themeCSS: '.node rect { fill: red; }',
+                logLevel: 3,
+                securityLevel: 'loose',
+                flowchart: { curve: 'basis' },
+                gantt: { axisFormat: '%m/%d/%Y' },
+                sequence: { actorMargin: 50 },
+                // sequenceDiagram: { actorMargin: 300 } // deprecated
+            });
+            var mermaidDiv = document.getElementById("mermaidbox");
+            window.renderChart = debounce(function () {
+             mermaidDiv.innerHTML = mermaid.mermaidAPI.render('graphDiv', CODE_PAD.getValue())
+            },1500);
+        });
+
+        require(['js-base64/base64'], function(bs){
+            var btn = document.querySelector('#download');
+            btn.addEventListener('click', function () {
+                hascode = bs.encode(JSON.stringify({
+                    code : CODE_PAD.getValue(),
+                    mermaid : {theme: "default"}
+                }))
+
+                  const element = document.querySelector('#download_link');
+                  element.setAttribute('href', 'https://mermaid-js.github.io/mermaid-live-editor/#/view/' + hascode);
+                  element.setAttribute('download', "flowchart.png");
+                  element.setAttribute('target', "_blank");
+                  //document.body.appendChild(element);
+                  element.click();
+            });
+
+
+        })
+
+    }
+
+    // Helper to get hash from end of URL or generate a random one.
+    function getExampleRef() {
+        var ref = firebase.database().ref();
+        var hash = window.location.hash.replace(/#/g, '');
+        if (hash) {
+            ref = ref.child(hash);
+        } else {
+            ref = ref.push(); // generate unique location.
+            window.location = window.location + '#' + ref.key; // add it as a hash to the URL.
+        }
+        if (typeof console !== 'undefined') {
+            console.log('Firebase data: ', ref.toString());
+        }
+        return ref;
+    }
+
+
+</script>
+
+
+<style type="text/css">
+    #mermaidbox #graphDiv{
+        font-size: 90%;
+    }
+</style>
+
+</html>
