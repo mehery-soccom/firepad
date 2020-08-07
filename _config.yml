@@ -1,3 +1,5 @@
 source: src
 markdown: rdiscount
 firepad_version: v1.5.10
+
+theme: jekyll-theme-cayman
