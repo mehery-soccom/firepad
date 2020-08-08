@@ -168,7 +168,10 @@ erDiagram
                   theme: 'myCoolTheme',
                   // value: getCode(),
                   //language: 'mySpecialLanguage'
-                  language: 'mermaid'
+                  language: 'mermaid',
+                  minimap: {
+                    enabled: false
+                  }
                 }
             );
             Firepad.fromMonaco(firepadRef, editor,{
@@ -204,7 +207,7 @@ erDiagram
             btn.addEventListener('click', function () {
                 hascode = bs.encode(JSON.stringify({
                     code : CODE_PAD.getValue(),
-                    mermaid : {theme: "default"}
+                    mermaid : {theme: "default"},"updateEditor":false
                 }))
 
                   const element = document.querySelector('#download_link');

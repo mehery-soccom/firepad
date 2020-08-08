@@ -202,7 +202,7 @@ sequenceDiagram
             btn.addEventListener('click', function () {
                 hascode = bs.encode(JSON.stringify({
                     code : CODE_PAD.getValue(),
-                    mermaid : {theme: "default"}
+                    mermaid : {theme: "default"},"updateEditor":false
                 }))
 
                   const element = document.querySelector('#download_link');
