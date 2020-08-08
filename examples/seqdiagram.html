@@ -203,7 +203,7 @@ sequenceDiagram
                 hascode = bs.encode(JSON.stringify({
                     code : CODE_PAD.getValue(),
                     mermaid : {theme: "default"},"updateEditor":false
-                }))
+                })).replace(/[+]/g,'-').replace(/\//g,'_')
 
                   const element = document.querySelector('#download_link');
                   element.setAttribute('href', 'https://mermaid-js.github.io/mermaid-live-editor/#/view/' + hascode);
