@@ -31,24 +31,19 @@
 
 
 <textarea id="defaultText" hidden>
-[Person]
-*name
-height
-weight
-+birth_location_id
+blockdiag {
+  Kroki -> generates -> "Block diagrams";
+  Kroki -> is -> "very easy!";
 
-[Location]
-*id
-city
-state
-country
-
-Person *--1 Location
+  Kroki [color = "greenyellow"];
+  "Block diagrams" [color = "pink"];
+  "very easy!" [color = "orange"];
+}
  </textarea>  
 
  <script src="https://cdn.jsdelivr.net/gh/webmodule/foo/foo.js"></script>
 <script>
-    var KROKI_CONTEXT = 'erd';
+    var KROKI_CONTEXT = 'blockdiag';
     function textEncode(str) {
       if (window.TextEncoder) {
         return new TextEncoder('utf-8').encode(str);
@@ -90,13 +85,13 @@ Person *--1 Location
             // Register a tokens provider for the language
             monaco.languages.setMonarchTokensProvider('mermaid', {
                 typeKeywords: [
-                  'graph', 'stateDiagram', 'sequenceDiagram', 'classDiagram', 'pie', 'flowchart', 'gantt'
+                  'blockdiag', 'color', '->'
                 ],
                 keywords: [
-                'patricipant','as'
+                 'blockdiag'
                 ],
                 arrows: [
-                  '---', '===', '-->', '==>'
+                  '->'
                 ],
                 tokenizer: {
                   root: [
