@@ -13,6 +13,8 @@
   <!-- Firepad -->
   <link rel="stylesheet" href="https://firepad.io/releases/v1.5.9/firepad.css" />
   <script src="https://firepad.io/releases/v1.5.9/firepad.min.js"></script>
+  <script src="js/fire.config.js"></script>
+
 
   <style>
     html { height: 100%; }
@@ -33,16 +35,7 @@
     function init() {
       //// Initialize Firebase.
       //// TODO: replace with your Firebase project configuration.
-      var config = {
-          apiKey: "AIzaSyAVpX7gTHZxCKcnk1INxRzkg0j5vvkVRpk",
-          authDomain: "meheryutils.firebaseapp.com",
-          databaseURL: "https://meheryutils-default-rtdb.firebaseio.com",
-          projectId: "meheryutils",
-          storageBucket: "meheryutils.appspot.com",
-          messagingSenderId: "58075259853",
-          appId: "1:58075259853:web:b381f70f316dbbd827da84",
-          measurementId: "G-4N1H0G8XQG"
-      };
+      var config = fireConfig();
       firebase.initializeApp(config);
 
       //// Get Firebase Database reference.

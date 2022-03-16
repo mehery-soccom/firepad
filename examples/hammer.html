@@ -38,11 +38,8 @@
     function init() {
       //// Initialize Firebase.
       //// TODO: replace with your Firebase project configuration.
-      var config = {
-        apiKey: '<API_KEY>',
-        authDomain: "firepad-tests.firebaseapp.com",
-        databaseURL: "https://firepad-tests.firebaseio.com"
-      };
+      var config = fireConfig();
+      
       firebase.initializeApp(config);
 
       //// Get Firebase Database reference.

@@ -64,11 +64,7 @@ stateDiagram
     function init() {
         //// Initialize Firebase.
         //// TODO: replace with your Firebase project configuration.
-        var config = {
-          apiKey: '<API_KEY>',
-          databaseURL: "https://firepad-test-e4255.firebaseio.com",
-          projectId: "firepad-test-e4255",
-        };
+        var config = fireConfig();
         firebase.initializeApp(config);
 
         //// Get Firebase Database reference.
