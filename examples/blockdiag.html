@@ -11,6 +11,7 @@
 
     <!-- Loader.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.js"></script>
+    <script src="js/fire.config.js"></script>
 
     <link rel="stylesheet" href="common.css" />
     <style>
@@ -59,7 +60,7 @@ blockdiag {
         //// Initialize Firebase.
         //// TODO: replace with your Firebase project configuration.
         var config = fireConfig();
-        
+
         firebase.initializeApp(config);
 
         //// Get Firebase Database reference.
