@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
+
+    <!-- Firepad -->
+    <link rel="stylesheet" href="https://firepad.io/releases/v1.5.9/firepad.css" />
+    <script src="https://firepad.io/releases/v1.5.9/firepad.js"></script>
+
+    <!-- Loader.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.js"></script>
+
+    <link rel="stylesheet" href="common.css" />
+    <style>
+    </style>
+
+</head>
+<body onload="init()">
+<div id="firepad"></div>
+<div class="mermaidboxwrap">
+    <div class=""><button id="download">Download</button></div>
+    <div id="mermaidbox" class="mermaidbox">
+
+    </div>
+    <a id="download_link" style="display: none;" download >Download</button>
+</div>
+
+
+<textarea id="defaultText" hidden>
+    {
+        "$schema": "https://vega.github.io/schema/vega/v5.json",
+        "width": 800,
+        "height": 400,
+        "padding": 0,
+      
+        "data": [
+          {
+            "name": "table",
+            "values": [
+              "Declarative visualization grammars can accelerate development, facilitate retargeting across platforms, and allow language-level optimizations. However, existing declarative visualization languages are primarily concerned with visual encoding, and rely on imperative event handlers for interactive behaviors. In response, we introduce a model of declarative interaction design for data visualizations. Adopting methods from reactive programming, we model low-level events as composable data streams from which we form higher-level semantic signals. Signals feed predicates and scale inversions, which allow us to generalize interactive selections at the level of item geometry (pixels) into interactive queries over the data domain. Production rules then use these queries to manipulate the visualization’s appearance. To facilitate reuse and sharing, these constructs can be encapsulated as named interactors: standalone, purely declarative specifications of interaction techniques. We assess our model’s feasibility and expressivity by instantiating it with extensions to the Vega visualization grammar. Through a diverse range of examples, we demonstrate coverage over an established taxonomy of visualization interaction techniques.",
+              "We present Reactive Vega, a system architecture that provides the first robust and comprehensive treatment of declarative visual and interaction design for data visualization. Starting from a single declarative specification, Reactive Vega constructs a dataflow graph in which input data, scene graph elements, and interaction events are all treated as first-class streaming data sources. To support expressive interactive visualizations that may involve time-varying scalar, relational, or hierarchical data, Reactive Vega’s dataflow graph can dynamically re-write itself at runtime by extending or pruning branches in a data-driven fashion. We discuss both compile- and run-time optimizations applied within Reactive Vega, and share the results of benchmark studies that indicate superior interactive performance to both D3 and the original, non-reactive Vega system.",
+              "We present Vega-Lite, a high-level grammar that enables rapid specification of interactive data visualizations. Vega-Lite combines a traditional grammar of graphics, providing visual encoding rules and a composition algebra for layered and multi-view displays, with a novel grammar of interaction. Users specify interactive semantics by composing selections. In Vega-Lite, a selection is an abstraction that defines input event processing, points of interest, and a predicate function for inclusion testing. Selections parameterize visual encodings by serving as input data, defining scale extents, or by driving conditional logic. The Vega-Lite compiler automatically synthesizes requisite data flow and event handling logic, which users can override for further customization. In contrast to existing reactive specifications, Vega-Lite selections decompose an interaction design into concise, enumerable semantic units. We evaluate Vega-Lite through a range of examples, demonstrating succinct specification of both customized interaction methods and common techniques such as panning, zooming, and linked selection."
+            ],
+            "transform": [
+              {
+                "type": "countpattern",
+                "field": "data",
+                "case": "upper",
+                "pattern": "[\\w']{3,}",
+                "stopwords": "(i|me|my|myself|we|us|our|ours|ourselves|you|your|yours|yourself|yourselves|he|him|his|himself|she|her|hers|herself|it|its|itself|they|them|their|theirs|themselves|what|which|who|whom|whose|this|that|these|those|am|is|are|was|were|be|been|being|have|has|had|having|do|does|did|doing|will|would|should|can|could|ought|i'm|you're|he's|she's|it's|we're|they're|i've|you've|we've|they've|i'd|you'd|he'd|she'd|we'd|they'd|i'll|you'll|he'll|she'll|we'll|they'll|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|doesn't|don't|didn't|won't|wouldn't|shan't|shouldn't|can't|cannot|couldn't|mustn't|let's|that's|who's|what's|here's|there's|when's|where's|why's|how's|a|an|the|and|but|if|or|because|as|until|while|of|at|by|for|with|about|against|between|into|through|during|before|after|above|below|to|from|up|upon|down|in|out|on|off|over|under|again|further|then|once|here|there|when|where|why|how|all|any|both|each|few|more|most|other|some|such|no|nor|not|only|own|same|so|than|too|very|say|says|said|shall)"
+              },
+              {
+                "type": "formula", "as": "angle",
+                "expr": "[-45, 0, 45][~~(random() * 3)]"
+              },
+              {
+                "type": "formula", "as": "weight",
+                "expr": "if(datum.text=='VEGA', 600, 300)"
+              }
+            ]
+          }
+        ],
+      
+        "scales": [
+          {
+            "name": "color",
+            "type": "ordinal",
+            "domain": {"data": "table", "field": "text"},
+            "range": ["#d5a928", "#652c90", "#939597"]
+          }
+        ],
+      
+        "marks": [
+          {
+            "type": "text",
+            "from": {"data": "table"},
+            "encode": {
+              "enter": {
+                "text": {"field": "text"},
+                "align": {"value": "center"},
+                "baseline": {"value": "alphabetic"},
+                "fill": {"scale": "color", "field": "text"}
+              },
+              "update": {
+                "fillOpacity": {"value": 1}
+              },
+              "hover": {
+                "fillOpacity": {"value": 0.5}
+              }
+            },
+            "transform": [
+              {
+                "type": "wordcloud",
+                "size": [800, 400],
+                "text": {"field": "text"},
+                "rotate": {"field": "datum.angle"},
+                "font": "Helvetica Neue, Arial",
+                "fontSize": {"field": "datum.count"},
+                "fontWeight": {"field": "datum.weight"},
+                "fontSizeRange": [12, 56],
+                "padding": 2
+              }
+            ]
+          }
+        ]
+      }
+ </textarea>  
+
+ <script src="https://cdn.jsdelivr.net/gh/webmodule/foo/foo.js"></script>
+ <script src="js/fire.config.js"></script>
+<script>
+    var KROKI_CONTEXT = 'vega';
+    function textEncode(str) {
+      if (window.TextEncoder) {
+        return new TextEncoder('utf-8').encode(str);
+      }
+      var utf8 = unescape(encodeURIComponent(str));
+      var result = new Uint8Array(utf8.length);
+      for (var i = 0; i < utf8.length; i++) {
+        result[i] = utf8.charCodeAt(i);
+      }
+      return result;
+    }
+
+    var CODE_PAD;
+    function init() {
+        //// Initialize Firebase.
+        //// TODO: replace with your Firebase project configuration.
+        var config = fireConfig();
+        firebase.initializeApp(config);
+
+        //// Get Firebase Database reference.
+        var firepadRef = getExampleRef();
+
+        //// Create Monaco and firepad.
+        require.config({ 
+            paths: {
+                'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs',
+                'dist' : 'https://unpkg.com/mermaid@8.6.4/dist',
+                'js-base64' : 'https://cdn.jsdelivr.net/npm/js-base64@3.4.4',
+                'pako' : 'https://unpkg.com/pako@1.0.10'
+            }
+        });
+        require(['vs/editor/editor.main'], function() {
+
+            monaco.languages.register({ id: 'mermaid' });
+            // Register a tokens provider for the language
+            monaco.languages.setMonarchTokensProvider('mermaid', {
+                typeKeywords: [
+                  'graph', 'stateDiagram', 'sequenceDiagram', 'classDiagram', 'pie', 'flowchart', 'gantt'
+                ],
+                keywords: [
+                'patricipant','as'
+                ],
+                arrows: [
+                  '---', '===', '-->', '==>'
+                ],
+                tokenizer: {
+                  root: [
+                    [/[{}]/, 'delimiter.bracket'],
+                    [/[a-z_$][\w$]*/, { cases: { '@typeKeywords': 'keyword',
+                                            '@keywords': 'keyword'} }],
+                    [/[-=>ox]+/, { cases: { '@arrows': 'transition'} }],
+                    [/[\[\{\(}]+.+?[\)\]\}]+/, "string"],
+                    [/\".*\"/, "string"],
+                  ]
+                },
+                whitespace: [
+                    [/[ \t\r\n]+/, 'white'],
+                    [/\%\%.*$/,    'comment'],
+                ],
+            });
+
+            self.MonacoEnvironment = {
+                getWorkerUrl: function (moduleId, label) {
+                    return './editor.worker.bundle.js';
+                }
+            }
+
+            // Define a new theme that contains only rules that match this language
+            monaco.editor.defineTheme('myCoolTheme', {
+                base: 'vs',
+                inherit: false,
+                rules: [
+                  { token: 'keyword', foreground: '880000', fontStyle: 'bold' },
+                  { token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold' },
+                  { token: 'string', foreground: 'AA8500' },
+                  { token: 'transition', foreground: '008800', fontStyle: 'bold'},
+                  { token: 'delimiter.bracket', foreground: '000000', fontStyle: 'bold'},
+                ]
+              });
+
+            // Register a completion item provider for the new language
+            monaco.languages.registerCompletionItemProvider('mySpecialLanguage', {
+                provideCompletionItems: () => {
+                    var suggestions = [{
+                        label: 'simpleText',
+                        kind: monaco.languages.CompletionItemKind.Text,
+                        insertText: 'simpleText'
+                    }, {
+                        label: 'testing',
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        insertText: 'testing(${1:condition})',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+                    }, {
+                        label: 'ifelse',
+                        kind: monaco.languages.CompletionItemKind.Snippet,
+                        insertText: [
+                            'if (${1:condition}) {',
+                            '\t$0',
+                            '} else {',
+                            '\t',
+                            '}'
+                        ].join('\n'),
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'If-Else Statement'
+                    }];
+                    return { suggestions: suggestions };
+                }
+            });
+
+            editor = monaco.editor.create(
+                document.getElementById('firepad'),
+                {
+                  theme: 'myCoolTheme',
+                  // value: getCode(),
+                  //language: 'mySpecialLanguage'
+                  language: 'mermaid',
+                  minimap: {
+                    enabled: false
+                  }
+                }
+            );
+            Firepad.fromMonaco(firepadRef, editor,{
+                defaultText: document.getElementById("defaultText").innerText
+            });
+            CODE_PAD = editor;
+            editor.onDidChangeModelContent(function(editor, change) {
+                window.renderChart();
+            });
+        });
+
+        require(['pako/dist/pako'], function(pako) {
+            var mermaidDiv = document.getElementById("mermaidbox");
+            window.renderChart = debounce(function () {
+                var data = textEncode(CODE_PAD.getValue());
+                var compressed = pako.deflate(data, { level: 9, to: 'string' });
+                var result = btoa(compressed).replace(/\+/g, '-').replace(/\//g, '_');
+                mermaidDiv.innerHTML = '<img src=https://kroki.io/'+ KROKI_CONTEXT +'/svg/'+result+' />'
+            },1500);
+        });
+
+        var btn = document.querySelector('#download');
+        btn.addEventListener('click', function () {
+            var img = document.querySelector("#mermaidbox img");
+              const element = document.querySelector('#download_link');
+              element.setAttribute('href', img.src);
+              element.setAttribute('download', "flowchart.png");
+              element.setAttribute('target', "_blank");
+              //document.body.appendChild(element);
+              element.click();
+        });
+
+    }
+
+    // Helper to get hash from end of URL or generate a random one.
+    function getExampleRef() {
+        var ref = firebase.database().ref();
+        var hash = window.location.hash.replace(/#/g, '');
+        if (hash) {
+            ref = ref.child(hash);
+        } else {
+            ref = ref.push(); // generate unique location.
+            window.location = window.location + '#' + ref.key; // add it as a hash to the URL.
+        }
+        if (typeof console !== 'undefined') {
+            console.log('Firebase data: ', ref.toString());
+        }
+        return ref;
+    }
+
+
+</script>
+
+
+<style type="text/css">
+    #mermaidbox #graphDiv{
+        font-size: 90%;
+    }
+</style>
+
+</html>

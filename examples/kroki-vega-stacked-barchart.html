@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
+
+    <!-- Firepad -->
+    <link rel="stylesheet" href="https://firepad.io/releases/v1.5.9/firepad.css" />
+    <script src="https://firepad.io/releases/v1.5.9/firepad.js"></script>
+
+    <!-- Loader.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.js"></script>
+
+    <link rel="stylesheet" href="common.css" />
+    <style>
+    </style>
+
+</head>
+<body onload="init()">
+<div id="firepad"></div>
+<div class="mermaidboxwrap">
+    <div class=""><button id="download">Download</button></div>
+    <div id="mermaidbox" class="mermaidbox">
+
+    </div>
+    <a id="download_link" style="display: none;" download >Download</button>
+</div>
+
+
+<textarea id="defaultText" hidden>
+  {
+    "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+    "description": "A diverging stacked bar chart for sentiments towards a set of eight questions, displayed as percentages with neutral responses straddling the 0% mark",
+    "data": {
+      "values": [
+        {"question": "Question 1", "type": "Strongly disagree", "value": 24, "percentage": 0.7},
+        {"question": "Question 1", "type": "Disagree", "value": 294, "percentage": 9.1},
+        {"question": "Question 1", "type": "Neither agree nor disagree", "value": 594, "percentage": 18.5},
+        {"question": "Question 1", "type": "Agree", "value": 1927, "percentage": 59.9},
+        {"question": "Question 1", "type": "Strongly agree", "value": 376, "percentage": 11.7},
+        {"question": "Question 2", "type": "Strongly disagree", "value": 2, "percentage": 18.2},
+        {"question": "Question 2", "type": "Disagree", "value": 2, "percentage": 18.2},
+        {"question": "Question 2", "type": "Neither agree nor disagree", "value": 0, "percentage": 0},
+        {"question": "Question 2", "type": "Agree", "value": 7, "percentage": 63.6},
+        {"question": "Question 2", "type": "Strongly agree", "value": 11, "percentage": 0},
+        {"question": "Question 3", "type": "Strongly disagree", "value": 2, "percentage": 20},
+        {"question": "Question 3", "type": "Disagree", "value": 0, "percentage": 0},
+        {"question": "Question 3", "type": "Neither agree nor disagree", "value": 2, "percentage": 20},
+        {"question": "Question 3", "type": "Agree", "value": 4, "percentage": 40},
+        {"question": "Question 3", "type": "Strongly agree", "value": 2, "percentage": 20},
+        {"question": "Question 4", "type": "Strongly disagree", "value": 0, "percentage": 0},
+        {"question": "Question 4", "type": "Disagree", "value": 2, "percentage": 12.5},
+        {"question": "Question 4", "type": "Neither agree nor disagree", "value": 1, "percentage": 6.3},
+        {"question": "Question 4", "type": "Agree", "value": 7, "percentage": 43.8},
+        {"question": "Question 4", "type": "Strongly agree", "value": 6, "percentage": 37.5},
+        {"question": "Question 5", "type": "Strongly disagree", "value": 0, "percentage": 0},
+        {"question": "Question 5", "type": "Disagree", "value": 1, "percentage": 4.2},
+        {"question": "Question 5", "type": "Neither agree nor disagree", "value": 3, "percentage": 12.5},
+        {"question": "Question 5", "type": "Agree", "value": 16, "percentage": 66.7},
+        {"question": "Question 5", "type": "Strongly agree", "value": 4, "percentage": 16.7},
+        {"question": "Question 6", "type": "Strongly disagree", "value": 1, "percentage": 6.3},
+        {"question": "Question 6", "type": "Disagree", "value": 1, "percentage": 6.3},
+        {"question": "Question 6", "type": "Neither agree nor disagree", "value": 2, "percentage": 12.5},
+        {"question": "Question 6", "type": "Agree", "value": 9, "percentage": 56.3},
+        {"question": "Question 6", "type": "Strongly agree", "value": 3, "percentage": 18.8},
+        {"question": "Question 7", "type": "Strongly disagree", "value": 0, "percentage": 0},
+        {"question": "Question 7", "type": "Disagree", "value": 0, "percentage": 0},
+        {"question": "Question 7", "type": "Neither agree nor disagree", "value": 1, "percentage": 20},
+        {"question": "Question 7", "type": "Agree", "value": 4, "percentage": 80},
+        {"question": "Question 7", "type": "Strongly agree", "value": 0, "percentage": 0},
+        {"question": "Question 8", "type": "Strongly disagree", "value": 0, "percentage": 0},
+        {"question": "Question 8", "type": "Disagree", "value": 0, "percentage": 0},
+        {"question": "Question 8", "type": "Neither agree nor disagree", "value": 0, "percentage": 0},
+        {"question": "Question 8", "type": "Agree", "value": 0, "percentage": 0},
+        {"question": "Question 8", "type": "Strongly agree", "value": 2, "percentage": 100}
+      ]
+    },
+    "transform": [
+      {
+        "calculate": "if(datum.type === 'Strongly disagree',-2,0) + if(datum.type==='Disagree',-1,0) + if(datum.type =='Neither agree nor disagree',0,0) + if(datum.type ==='Agree',1,0) + if(datum.type ==='Strongly agree',2,0)",
+        "as": "q_order"
+      },
+      {
+        "calculate": "if(datum.type === 'Disagree' || datum.type === 'Strongly disagree', datum.percentage,0) + if(datum.type === 'Neither agree nor disagree', datum.percentage / 2,0)",
+        "as": "signed_percentage"
+      },
+      {"stack": "percentage", "as": ["v1", "v2"], "groupby": ["question"]},
+      {
+        "joinaggregate": [
+          {
+            "field": "signed_percentage",
+            "op": "sum",
+            "as": "offset"
+          }
+        ],
+        "groupby": ["question"]
+      },
+      {"calculate": "datum.v1 - datum.offset", "as": "nx"},
+      {"calculate": "datum.v2 - datum.offset", "as": "nx2"}
+    ],
+    "mark": "bar",
+    "encoding": {
+      "x": {
+        "field": "nx",
+        "type": "quantitative",
+        "axis": {
+          "title": "Percentage"
+        }
+      },
+      "x2": {"field": "nx2"},
+      "y": {
+        "field": "question",
+        "type": "nominal",
+        "axis": {
+          "title": "Question",
+          "offset": 5,
+          "ticks": false,
+          "minExtent": 60,
+          "domain": false
+        }
+      },
+      "color": {
+        "field": "type",
+        "type": "nominal",
+        "legend": {
+          "title": "Response"
+        },
+        "scale": {
+          "domain": ["Strongly disagree", "Disagree", "Neither agree nor disagree", "Agree", "Strongly agree"],
+          "range": ["#c30d24", "#f3a583", "#cccccc", "#94c6da", "#1770ab"],
+          "type": "ordinal"
+        }
+      }
+    }
+  }
+ </textarea>  
+
+ <script src="https://cdn.jsdelivr.net/gh/webmodule/foo/foo.js"></script>
+ <script src="js/fire.config.js"></script>
+<script>
+    var KROKI_CONTEXT = 'vegalite';
+    function textEncode(str) {
+      if (window.TextEncoder) {
+        return new TextEncoder('utf-8').encode(str);
+      }
+      var utf8 = unescape(encodeURIComponent(str));
+      var result = new Uint8Array(utf8.length);
+      for (var i = 0; i < utf8.length; i++) {
+        result[i] = utf8.charCodeAt(i);
+      }
+      return result;
+    }
+
+    var CODE_PAD;
+    function init() {
+        //// Initialize Firebase.
+        //// TODO: replace with your Firebase project configuration.
+        var config = fireConfig();
+        firebase.initializeApp(config);
+
+        //// Get Firebase Database reference.
+        var firepadRef = getExampleRef();
+
+        //// Create Monaco and firepad.
+        require.config({ 
+            paths: {
+                'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs',
+                'dist' : 'https://unpkg.com/mermaid@8.6.4/dist',
+                'js-base64' : 'https://cdn.jsdelivr.net/npm/js-base64@3.4.4',
+                'pako' : 'https://unpkg.com/pako@1.0.10'
+            }
+        });
+        require(['vs/editor/editor.main'], function() {
+
+            monaco.languages.register({ id: 'mermaid' });
+            // Register a tokens provider for the language
+            monaco.languages.setMonarchTokensProvider('mermaid', {
+                typeKeywords: [
+                  'graph', 'stateDiagram', 'sequenceDiagram', 'classDiagram', 'pie', 'flowchart', 'gantt'
+                ],
+                keywords: [
+                'patricipant','as'
+                ],
+                arrows: [
+                  '---', '===', '-->', '==>'
+                ],
+                tokenizer: {
+                  root: [
+                    [/[{}]/, 'delimiter.bracket'],
+                    [/[a-z_$][\w$]*/, { cases: { '@typeKeywords': 'keyword',
+                                            '@keywords': 'keyword'} }],
+                    [/[-=>ox]+/, { cases: { '@arrows': 'transition'} }],
+                    [/[\[\{\(}]+.+?[\)\]\}]+/, "string"],
+                    [/\".*\"/, "string"],
+                  ]
+                },
+                whitespace: [
+                    [/[ \t\r\n]+/, 'white'],
+                    [/\%\%.*$/,    'comment'],
+                ],
+            });
+
+            self.MonacoEnvironment = {
+                getWorkerUrl: function (moduleId, label) {
+                    return './editor.worker.bundle.js';
+                }
+            }
+
+            // Define a new theme that contains only rules that match this language
+            monaco.editor.defineTheme('myCoolTheme', {
+                base: 'vs',
+                inherit: false,
+                rules: [
+                  { token: 'keyword', foreground: '880000', fontStyle: 'bold' },
+                  { token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold' },
+                  { token: 'string', foreground: 'AA8500' },
+                  { token: 'transition', foreground: '008800', fontStyle: 'bold'},
+                  { token: 'delimiter.bracket', foreground: '000000', fontStyle: 'bold'},
+                ]
+              });
+
+            // Register a completion item provider for the new language
+            monaco.languages.registerCompletionItemProvider('mySpecialLanguage', {
+                provideCompletionItems: () => {
+                    var suggestions = [{
+                        label: 'simpleText',
+                        kind: monaco.languages.CompletionItemKind.Text,
+                        insertText: 'simpleText'
+                    }, {
+                        label: 'testing',
+                        kind: monaco.languages.CompletionItemKind.Keyword,
+                        insertText: 'testing(${1:condition})',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+                    }, {
+                        label: 'ifelse',
+                        kind: monaco.languages.CompletionItemKind.Snippet,
+                        insertText: [
+                            'if (${1:condition}) {',
+                            '\t$0',
+                            '} else {',
+                            '\t',
+                            '}'
+                        ].join('\n'),
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'If-Else Statement'
+                    }];
+                    return { suggestions: suggestions };
+                }
+            });
+
+            editor = monaco.editor.create(
+                document.getElementById('firepad'),
+                {
+                  theme: 'myCoolTheme',
+                  // value: getCode(),
+                  //language: 'mySpecialLanguage'
+                  language: 'mermaid',
+                  minimap: {
+                    enabled: false
+                  }
+                }
+            );
+            Firepad.fromMonaco(firepadRef, editor,{
+                defaultText: document.getElementById("defaultText").innerText
+            });
+            CODE_PAD = editor;
+            editor.onDidChangeModelContent(function(editor, change) {
+                window.renderChart();
+            });
+        });
+
+        require(['pako/dist/pako'], function(pako) {
+            var mermaidDiv = document.getElementById("mermaidbox");
+            window.renderChart = debounce(function () {
+                var data = textEncode(CODE_PAD.getValue());
+                var compressed = pako.deflate(data, { level: 9, to: 'string' });
+                var result = btoa(compressed).replace(/\+/g, '-').replace(/\//g, '_');
+                mermaidDiv.innerHTML = '<img src=https://kroki.io/'+ KROKI_CONTEXT +'/svg/'+result+' />'
+            },1500);
+        });
+
+        var btn = document.querySelector('#download');
+        btn.addEventListener('click', function () {
+            var img = document.querySelector("#mermaidbox img");
+              const element = document.querySelector('#download_link');
+              element.setAttribute('href', img.src);
+              element.setAttribute('download', "flowchart.png");
+              element.setAttribute('target', "_blank");
+              //document.body.appendChild(element);
+              element.click();
+        });
+
+    }
+
+    // Helper to get hash from end of URL or generate a random one.
+    function getExampleRef() {
+        var ref = firebase.database().ref();
+        var hash = window.location.hash.replace(/#/g, '');
+        if (hash) {
+            ref = ref.child(hash);
+        } else {
+            ref = ref.push(); // generate unique location.
+            window.location = window.location + '#' + ref.key; // add it as a hash to the URL.
+        }
+        if (typeof console !== 'undefined') {
+            console.log('Firebase data: ', ref.toString());
+        }
+        return ref;
+    }
+
+
+</script>
+
+
+<style type="text/css">
+    #mermaidbox #graphDiv{
+        font-size: 90%;
+    }
+</style>
+
+</html>
