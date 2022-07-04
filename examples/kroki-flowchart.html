@@ -31,17 +31,13 @@
 
 
 <textarea id="defaultText" hidden>
-graph TD
-    A[Christmas]
-    B(Go shopping)
-    D[Laptop]
-    F[fa:fa-car Car]
-    C{Let me think}
-    A -->|Get money| B
-    B --> C
-    C -->|One| D
-    C -->|Two| E[iPhone]
-    C -->|Three| F
+flowchart TB
+    A[Hard edge] -->|Link text| B(Round edge)
+    B --> C{Decision}
+    subgraph one
+    C -->|One| D[Result one]
+    C -->|Two| E[Result two]
+    end
  </textarea>  
 
  <script src="https://cdn.jsdelivr.net/gh/webmodule/foo/foo.js"></script>
